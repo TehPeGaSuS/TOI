@@ -9,8 +9,14 @@ max_logs_days=7
 # Path to the uploads folder (usually you don't need to edit this)
 uploads=$HOME/.thelounge/uploads
 
-# How many days to keep the files
+# How many days to keep the uploaded files
 max_upload_days=7
+
+###############
+# DON'T TOUCH ANYTHING BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
+###############
+# If you touch the code below and then complain the script "suddenly stopped working" I'll touch you at night. (THANKS thommey)
+###############
 
 # Cleaning up the sqlite logs
 for filename in "$logs"/*.sqlite3; do

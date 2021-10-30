@@ -1,0 +1,13 @@
+[Unit]
+Description=The Lounge (IRC client)
+Wants=default.target
+After=default.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Environment=THELOUNGE_HOME=~/.thelounge
+ExecStart=/usr/bin/screen -dmSU lounge /usr/local/bin/thelounge start
+
+[Install]
+WantedBy=default.target

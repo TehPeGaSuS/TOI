@@ -7,3 +7,4 @@
 
 #### Combination of the above scripts
 
+[purge_all.sh](https://github.com/PeGaSuS-Coder/TOI/blob/main/TheLounge/purge_all.sh)

@@ -1,3 +1,5 @@
 ## Useful scripts
-#### Delete uploaded files and messages from the sqlite database older than X days
-[purge.sh](https://github.com/PeGaSuS-Coder/TOI/blob/main/TheLounge/purge.sh)
+#### Delete uploaded files older than X days and messages from the sqlite database older than X days
+[purge_sqlite.sh](https://github.com/PeGaSuS-Coder/TOI/blob/main/TheLounge/purge_sqlite.sh)
+
+#### Delete uploaded files older than X days and trim plaintext logs to X number of lines

@@ -1,4 +1,4 @@
-## Useful scripts
+## Useful scripts to use with TheLounge
 #### Delete uploaded files older than X days and messages from the sqlite database older than X days
 [purge_sqlite.sh](https://github.com/PeGaSuS-Coder/TOI/blob/main/TheLounge/purge_sqlite.sh)
 

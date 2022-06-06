@@ -4,10 +4,8 @@ Wants=default.target
 After=default.target
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
+Type=simple
 Environment=THELOUNGE_HOME=~/.thelounge
-ExecStart=/usr/bin/screen -dmSU lounge /usr/local/bin/thelounge start
-
+ExecStart=/usr/local/bin/thelounge start
 [Install]
 WantedBy=default.target

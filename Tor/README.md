@@ -1,3 +1,8 @@
+[Portugues](https://github.com/PeGaSuS-Coder/TOI/tree/main/Tor#ptirc-tor-server)  
+[English](https://github.com/PeGaSuS-Coder/TOI/edit/main/Tor/README.md#ptirc-tor-server)
+
+----
+
 ### Servidor Tor da PTirc
 
 Se está a ler esta página é porque tentou aceder ao nosso servidor **Tor** sem utilizar **SASL**.  

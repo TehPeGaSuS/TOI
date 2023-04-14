@@ -1,5 +1,5 @@
-[Portugues](https://github.com/PeGaSuS-Coder/TOI/tree/main/Tor#ptirc-tor-server)  
-[English](https://github.com/PeGaSuS-Coder/TOI/edit/main/Tor/README.md#ptirc-tor-server)
+[Portugues](https://github.com/PeGaSuS-Coder/TOI/tree/main/Tor#servidor-tor-da-ptirc)  
+[English](https://github.com/PeGaSuS-Coder/TOI/tree/main/Tor#ptirc-tor-server)
 
 ----
 

@@ -10,7 +10,7 @@ Se está a ler esta página é porque tentou aceder ao nosso servidor **Tor** se
 Apesar de a PTirc entender que por vezes a utilizaçao do sistema **Tor** é feito com boas intenções e serve para proteger a privacidade de quem o utiliza, 
 por vezes existem utilizadores que abusam deste mesmo serviço.
 
-Desta forma, e para evitar certos disturbios na rede. todos aqueles que desejarem entrar na PTirc usando o sistema **Tor** deverão ter o nick registado.
+Desta forma, e para evitar certos disturbios na rede, todos aqueles que desejarem entrar na PTirc usando o sistema **Tor** deverão ter o nick registado.
 
 Podem registar o vosso nick de duas formas:  
 - Através do nosso [webchat](https://chat.ptirc.org) com o comando `/NickServ register PASSWORD EMAIL`, subsituindo `PASSWORD` por uma palavra passe 
@@ -33,7 +33,7 @@ If you're reading this page, it's because you tried to access our **Tor** server
 Although PTirc understands that sometimes the use of the **Tor** system is done with good intentions and serves to protect the privacy of those who use it,
 sometimes there are users who abuse this same service.
 
-In this way, and to avoid certain disturbances in the network. all those who wish to enter PTirc using the **Tor** system must have their nickname registered.
+In this way, and to avoid certain disturbances in the network, all those who wish to enter PTirc using the **Tor** system must have their nickname registered.
 
 You can register your nick in two ways:
 - Through our [webchat](https://chat.ptirc.org) with the command `/NickServ register PASSWORD EMAIL`, replacing `PASSWORD` with a password

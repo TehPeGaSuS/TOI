@@ -22,6 +22,8 @@ Após o registo do nick irá receber um email com instruções sobre como confir
 
 Após ter o seu nick registado e confirmado, deve configurar o seu cliente de IRC para se ligar ao nosso endereço onion, utilizando **SASL**.
 
+As portas do nosso servidor **Tor** são as seguintes: `7000` (standard) e `7001` (TLS).
+
 Para saber como configurar o seu cliente de IRC para usar **SASL**, consulte a documentação do mesmo.
 
 ----
@@ -44,5 +46,7 @@ of your choice and `EMAIL` by your personal email.
 After nick registration you will receive an email with instructions on how to confirm your registration.
 
 After having your nick registered and confirmed, you must configure your IRC client to connect to our onion address, using **SASL**.
+
+The ports of our **Tor** server are as follows: `7000` (standard) and `7001` (TLS).
 
 To find out how to configure your IRC client to use **SASL**, consult its documentation.

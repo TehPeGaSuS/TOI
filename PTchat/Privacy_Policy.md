@@ -2,7 +2,7 @@
 
 <p>At PTchat, accessible from https://ptchat.org, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by PTchat and how we use it.</p>
 
-<p>If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.</p>
+<p>If you require any more information or have any questions about our site, please feel free to contact us by email at zncuser@gmail.com</p>
 
 <h2>Log Files</h2>
 

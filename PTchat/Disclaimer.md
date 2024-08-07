@@ -1,6 +1,6 @@
 <h1>Disclaimer for PTchat</h1>
 
-<p>If you require any more information or have any questions about our site's disclaimer, please feel free to contact us by email at zncuser@gmail.com</p>
+<p>If you require any more information or have any questions about our site, please feel free to contact us by email at zncuser@gmail.com</p>
 
 <h2>Disclaimers for PTchat</h2>
 

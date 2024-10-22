@@ -1,5 +1,5 @@
 # Disclaimer for Chat82
-_Last updated: 22 October 2024_
+_Last updated: October 22, 2024_
 
 If you require any more information or have any questions about our site, please feel free to contact us by email at zncuser@gmail.com
 

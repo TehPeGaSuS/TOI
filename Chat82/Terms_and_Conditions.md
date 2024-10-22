@@ -3,7 +3,7 @@ _Last updated: October 22, 2024_
 
 Welcome to Chat82!
 
-These terms and conditions outline the rules and regulations for the use of Chat82's Website, located at https://chat82.duckdns.org.
+These terms and conditions outline the rules and regulations for the use of Chat82's Website, located at https://chat82.mooo.com.
 
 If you require any more information or have any questions about our site, please feel free to contact us by email at zncuser@gmail.com
 

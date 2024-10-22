@@ -1,43 +1,46 @@
-<h1>Privacy Policy for Chat82</h1>
+# Privacy Policy for Chat82
 
-<p>At Chat82, accessible from https://chat82.duckdns.org, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Chat82 and how we use it.</p>
+_Last updated: 22 October 2024_
 
-<p>If you require any more information or have any questions about our site, please feel free to contact us by email at zncuser@gmail.com</p>
+At `https://chat82.duckdns.org`, we are committed to protecting your privacy and ensuring the security of any personal information you may provide while using our self-hosted Mattermost instance. This Privacy Policy outlines how we collect, use, and protect your information.
 
-<h2>Log Files</h2>
+## 1. Information We Collect
+We may collect the following types of information when you use our Mattermost instance:
 
-<p>Chat82 follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services' analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.
+- **Personal Information:** When you create an account, we collect your email address, username, and any other information you choose to provide, such as a profile picture or display name.
+- **Usage Data:** We may collect information on how you interact with the platform, including IP addresses, browser types, timestamps, and chat interactions.
+- **Cookies and Tracking:** Our site may use cookies to improve your experience. Cookies are small files stored on your device that help us identify and store preferences for future visits.
 
-<h2>Cookies and Web Beacons</h2>
+## 2. How We Use Your Information
+We use the information we collect for the following purposes:
 
-<p>Like any other website, Chat82 uses "cookies". These cookies are used to store information including visitors' preferences, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.</p>
+- **To provide and maintain the service:** We process your data to ensure the smooth running of the Mattermost instance.
+- **To improve the user experience:** We use the data to enhance the service and troubleshoot issues.
+- **To communicate with you:** We may use your email address to send important updates, security notices, or respond to your inquiries.
 
-<p>For more general information on cookies, please read <a href="https://www.privacypolicyonline.com/what-are-cookies/">the "Cookies" article from the Privacy Policy Generator</a>.</p>
+## 3. Sharing and Disclosure
+We do not sell, trade, or otherwise transfer your personal information to outside parties, except under the following circumstances:
 
-<h2>Privacy Policies</h2>
+- **Legal Requirements:** We may disclose your information if required by law or in response to valid legal processes.
+- **Security Concerns:** In cases where there is a risk of harm to users or the system, we may disclose necessary information to prevent fraud or ensure security.
 
-<P>You may consult this list to find the Privacy Policy for each of the advertising partners of Chat82.</p>
+## 4. Data Security
+We take appropriate measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of data transmission or storage is completely secure. While we strive to protect your information, we cannot guarantee its absolute security.
 
-<p>Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on Chat82, which are sent directly to users' browser. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.</p>
+## 5. Your Rights
+You have the following rights regarding your personal information:
 
-<p>Note that Chat82 has no access to or control over these cookies that are used by third-party advertisers.</p>
+- **Access:** You can request a copy of the information we hold about you.
+- **Correction:** You can request that we correct any inaccurate or incomplete information.
+- **Deletion:** You can request the deletion of your account and associated data by contacting us at the email below.
 
-<h2>Third Party Privacy Policies</h2>
+## 6. Data Retention
+We retain your personal information for as long as your account is active or as needed to provide the service. We may also retain your information to comply with legal obligations or resolve disputes.
 
-<p>Chat82's Privacy Policy does not apply to other advertisers or websites. Thus, we are advising you to consult the respective Privacy Policies of these third-party ad servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options. </p>
+## 7. Contact Information
+If you have any questions or concerns about this Privacy Policy, or wish to exercise your rights regarding your personal information, please contact us at:
 
-<p>You can choose to disable cookies through your individual browser options. To know more detailed information about cookie management with specific web browsers, it can be found at the browsers' respective websites. <a href="https://www.privacypolicyonline.com/what-are-cookies/">What Are Cookies?</a></p>
+**Email:** `zncuser@gmail.com`
 
-<h2>Children's Information</h2>
-
-<p>Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.</p>
-
-<p>Chat82 does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our website, we strongly encourage you to contact us immediately and we will do our best efforts to promptly remove such information from our records.</p>
-
-<h2>Online Privacy Policy Only</h2>
-
-<p>This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in Chat82. This policy is not applicable to any information collected offline or via channels other than this website.</p>
-
-<h2>Consent</h2>
-
-<p>By using our website, you hereby consent to our Privacy Policy and agree to its Terms and Conditions.</p>
+## 8. Changes to This Privacy Policy
+We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date. We encourage you to review the policy periodically.

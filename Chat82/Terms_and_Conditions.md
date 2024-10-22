@@ -1,5 +1,5 @@
 # Terms and Conditions
-_Last updated: 22 October 2024_
+_Last updated: October 22, 2024_
 
 Welcome to Chat82!
 

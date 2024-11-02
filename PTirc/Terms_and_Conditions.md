@@ -1,5 +1,5 @@
 # Terms and Conditions
-Last updated: November 02, 2024
+_Last updated: November 02, 2024_
 
 Welcome to PTirc Messenger!
 

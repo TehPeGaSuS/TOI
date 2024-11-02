@@ -5,7 +5,7 @@ Welcome to PTirc Messenger!
 
 These terms and conditions outline the rules and regulations for the use of PTirc Messenger's Website, located at https://msn.ptirc.org.
 
-If you require any more information or have any questions about our site, please feel free to contact us by email at zncuser@gmail.com
+If you require any more information or have any questions about our site, please feel free to contact us by email at msn@ptirc.org
 
 By accessing this website we assume you accept these terms and conditions. Do not continue to use PTirc Messenger if you do not agree to take all of the terms and conditions stated on this page.
 

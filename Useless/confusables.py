@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# confusables - developed by acidvegas in python (https://git.acid.vegas/random)
-
 '''
 This script contains a dictionary of keyboard typable characters unicode variants that are very similar.
 Other possible variants exist, for now we are only matching the ones that do not "look" like unicode.

@@ -62,4 +62,4 @@ Email: <a href="mailto:zncuser@gmail.com">zncuser@gmail.com</a><br>
 Site: <a href="https://ptchat.org">https://ptchat.org</a></p>
 
 <h2>12. Consent</h2>
-<p>By using our website or creating an account, you consent to this Privacy Policy and our <a href="https://github.com/TehPeGaSuS/TOI/blob/main/PTchat/Privacy_Policy.md">Terms and Conditions</a>.</p>
+<p>By using our website or creating an account, you consent to this Privacy Policy and our <a href="/PTchat/Terms_and_Conditions.md">Terms and Conditions</a>.</p>

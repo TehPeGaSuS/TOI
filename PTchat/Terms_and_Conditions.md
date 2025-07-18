@@ -2,7 +2,7 @@
 
 <p>Effective Date: 18 July 2025</p>
 
-<p>Welcome to <strong>PTchat</strong>. These terms and conditions ("Terms") govern your use of our website, available at <a href="https://ptchat.org">https://ptchat.org</a>. By accessing or using PTchat, you agree to be bound by these Terms and our <a href="/Privacy_Policy.md">Privacy Policy</a>. If you do not agree with these Terms, you must not use the website.</p>
+<p>Welcome to <strong>PTchat</strong>. These terms and conditions ("Terms") govern your use of our website, available at <a href="https://ptchat.org">https://ptchat.org</a>. By accessing or using PTchat, you agree to be bound by these Terms and our <a href="/PTchat/Privacy_Policy.md">Privacy Policy</a>. If you do not agree with these Terms, you must not use the website.</p>
 
 <h2>1. Definitions</h2>
 <p>"We", "us", or "our" refers to PTchat. "You" or "User" refers to the individual accessing or using the service. "Content" means all material available on PTchat, including but not limited to text, graphics, logos, and software.</p>

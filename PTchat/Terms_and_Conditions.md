@@ -2,7 +2,7 @@
 
 <p>Effective Date: 18 July 2025</p>
 
-<p>Welcome to <strong>PTchat</strong>. These terms and conditions ("Terms") govern your use of our website, available at <a href="https://ptchat.org">https://ptchat.org</a>. By accessing or using PTchat, you agree to be bound by these Terms and our <a href="/privacy">Privacy Policy</a>. If you do not agree with these Terms, you must not use the website.</p>
+<p>Welcome to <strong>PTchat</strong>. These terms and conditions ("Terms") govern your use of our website, available at <a href="https://ptchat.org">https://ptchat.org</a>. By accessing or using PTchat, you agree to be bound by these Terms and our <a href="/main/PTchat/Privacy_Policy.md">Privacy Policy</a>. If you do not agree with these Terms, you must not use the website.</p>
 
 <h2>1. Definitions</h2>
 <p>"We", "us", or "our" refers to PTchat. "You" or "User" refers to the individual accessing or using the service. "Content" means all material available on PTchat, including but not limited to text, graphics, logos, and software.</p>
@@ -11,7 +11,7 @@
 <p>By using PTchat, you confirm that you are at least 13 years old or the minimum legal age in your country. If you are underage, you must not use the service without parental consent. You also acknowledge that these Terms may be updated from time to time and continued use constitutes your acceptance of those changes.</p>
 
 <h2>3. Cookies</h2>
-<p>PTchat uses cookies to enhance your experience and to analyze traffic. By continuing to use our site, you consent to our use of cookies in accordance with our <a href="/privacy">Privacy Policy</a>.</p>
+<p>PTchat uses cookies to enhance your experience and to analyze traffic. By continuing to use our site, you consent to our use of cookies in accordance with our <a href="/main/PTchat/Privacy_Policy.md">Privacy Policy</a>.</p>
 
 <h2>4. User Contributions</h2>
 <p>You may post comments or other content where allowed. You are solely responsible for your posts and must ensure they:</p>
@@ -40,7 +40,7 @@
 <p>You may not frame PTchat’s webpages or alter their appearance without express written permission.</p>
 
 <h2>8. Privacy and Data Use</h2>
-<p>Your use of PTchat is also governed by our <a href="/privacy">Privacy Policy</a>, which complies with the <strong>GDPR</strong>, <strong>CCPA</strong>, and <strong>CalOPPA</strong>. You have rights regarding your personal data, including access, deletion, and objection to processing. For more information, see our Privacy Policy.</p>
+<p>Your use of PTchat is also governed by our <a href="/main/PTchat/Privacy_Policy.md">Privacy Policy</a>, which complies with the <strong>GDPR</strong>, <strong>CCPA</strong>, and <strong>CalOPPA</strong>. You have rights regarding your personal data, including access, deletion, and objection to processing. For more information, see our Privacy Policy.</p>
 
 <h2>9. Disclaimer</h2>
 <p>PTchat is provided "as is" without warranties of any kind. We do not guarantee accuracy, completeness, or availability of the site or its content. We disclaim liability to the fullest extent permitted by law.</p>

@@ -60,15 +60,27 @@ You can control or disable cookies via your browser settings. Some features may 
 
 ---
 
-## 3. Voice and Video Calls (Third-Party Services)
+## 3. Voice and Video Communications
 
-Voice and video calls are provided via **third-party services** integrated into the platform.
+### 3.1 Voice Calls (Built-In)
+Hookupz.win provides **built-in voice calling functionality** as part of the platform.
 
-- Audio and video streams may be processed by these third parties
-- We do **not** control how third-party providers process your data
-- Their privacy practices are governed by their own privacy policies
+- Voice communications may be processed by the platform’s underlying software (Mattermost)
+- Audio data is transmitted to facilitate real-time communication between users
+- We do not actively record voice calls unless required for security, moderation, or legal compliance
 
-By using voice or video features, you acknowledge and accept this data processing.
+Voice communications are subject to this Privacy Policy and applicable data protection laws.
+
+---
+
+### 3.2 Video Calls (Third-Party Services)
+Video calling functionality on Hookupz.win is provided via **third-party services** integrated into the platform.
+
+- Video and associated audio streams may be processed directly by third-party providers
+- We do not control how third-party providers collect, store, or process data
+- The privacy practices of these providers are governed by their own privacy policies
+
+By using video call features, you acknowledge that your data may be processed by external services and agree to their applicable terms and privacy policies.
 
 ---
 

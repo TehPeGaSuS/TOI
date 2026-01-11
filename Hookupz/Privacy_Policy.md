@@ -110,16 +110,61 @@ Under GDPR, we process personal data based on:
 
 ---
 
-## 6. Data Retention
+## 6. Data Retention and Account Status
 
-We retain personal data only for as long as necessary to:
+We retain personal data only for as long as necessary to operate the service, comply with legal obligations, resolve disputes, and enforce our policies. Hookupz.win follows a **data minimisation approach** wherever possible.
 
-- Provide the service
-- Comply with legal obligations
-- Resolve disputes
-- Enforce agreements
+---
 
-Users may request account deletion, subject to legal and technical limitations.
+### 6.1 Automatic Deletion of Messages and Uploaded Content
+
+To protect user privacy, **all user-generated content** is automatically deleted after a short retention period.
+
+This includes, but is not limited to:
+
+- Chat messages
+- Uploaded files
+- Images and media
+- Shared content in channels or private conversations
+
+**Retention period:**  
+All such content is automatically removed **after 7 days**, regardless of account status.
+
+This deletion process is automated and irreversible.
+
+---
+
+### 6.2 Account Deactivation
+
+Users may **deactivate their own account** through available account settings.
+
+- Deactivation disables access to the account
+- Profile visibility and participation are restricted
+- Deactivation does not immediately delete account metadata
+
+Deactivated accounts may be reactivated unless permanently deleted.
+
+---
+
+### 6.3 Account Deletion Requests
+
+Permanent **account deletion must be requested manually**.
+
+- Users may request deletion by contacting us using the details provided in this Privacy Policy
+- Requests are handled within a reasonable timeframe, subject to legal and technical limitations
+- Certain minimal data may be retained where required by law or for legitimate interests (e.g. abuse prevention)
+
+Once an account is deleted, it cannot be restored.
+
+---
+
+### 6.4 Logs, Backups, and Legal Retention
+
+Technical logs or backup data may temporarily retain residual information.
+
+- Backup data is overwritten according to routine backup cycles
+- We do not actively restore deleted user content from backups
+- Data required for legal compliance or security may be retained as permitted by law
 
 ---
 

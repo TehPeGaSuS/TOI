@@ -1,6 +1,6 @@
 ### plugin.py
 # Copyright (c) 2022, Mike Oxlong
-# V1.04 - Added expiry timestamp display
+# V1.05 - Fixed manual bans to auto-remove from channel
 ###
 
 import json, os, time, threading, re
@@ -104,12 +104,23 @@ class Blacklist(callbacks.Plugin):
           irc.state.channels[msg.args[0]].isHalfopPlus(irc.nick) and \
           not ircutils.strEqual(msg.nick, irc.nick) and \
           (msg.args[0] not in self.db or msg.args[2] not in self.db[msg.args[0]]):
+            channel = msg.args[0]
+            mask = msg.args[2]
             # Calculate expiry for manually added bans (use banlistExpiry setting)
-            expiry_time = int(time.time()) + (self.registryValue('banlistExpiry', msg.args[0]) * 60)
-            try: self.db[msg.args[0]][msg.args[2]] = [msg.nick, time.time(), '*user-added ban', expiry_time, False]
-            except KeyError: self.db[msg.args[0]] = {msg.args[2]: [msg.nick, time.time(), '*user-added ban', expiry_time, False]}
+            expiry_time = int(time.time()) + (self.registryValue('banlistExpiry', channel) * 60)
+            try: self.db[channel][mask] = [msg.nick, time.time(), '*user-added ban', expiry_time, False]
+            except KeyError: self.db[channel] = {mask: [msg.nick, time.time(), '*user-added ban', expiry_time, False]}
             self._dbWrite()
-            irc.reply(f'"{msg.args[2]}" added to the banlist for {msg.args[0]}.')
+            irc.reply(f'"{mask}" added to the banlist for {channel}.')
+            
+            # Schedule automatic removal from channel (keep in database like normal bans)
+            def _normalExpiry():
+                # Only remove from channel, keep in database
+                irc.queueMsg(ircmsgs.unban(channel, mask))
+            
+            schedule.addEvent(_normalExpiry,
+                              time.time()+(self.registryValue('banlistExpiry', channel)*60),
+                              f'bl_unban_{channel}{mask}')
     
     def doJoin(self, irc, msg):
         if self.registryValue('enabled', msg.args[0]) and \

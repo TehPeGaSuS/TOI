@@ -59,7 +59,7 @@ conf.registerChannelValue(Blacklist, 'enabled',
         registry.Boolean(False, """Set whether to enable database in a channel."""))
 
 conf.registerChannelValue(Blacklist, 'banlistExpiry',
-        registry.PositiveInteger(180, """Sets the number of minutes before a ban is removed from the channl's banlist."""))
+        registry.PositiveInteger(120, """Sets the number of minutes before a ban is removed from the channl's banlist."""))
 
 conf.registerChannelValue(Blacklist, 'banTimerExpiry',
         registry.PositiveInteger(30, """Sets the numer of minutes before a timed ban expires if none is given."""))
@@ -74,6 +74,6 @@ conf.registerChannelValue(Blacklist, 'addManualBans',
         registry.Boolean(False, """Sets whether to watch for channel bans directly added by users (not using the bot) to the database."""))
 
 conf.registerChannelValue(Blacklist, 'maxListOutput',
-        registry.NonNegativeInteger(5, """Sets the maximum number of ban entries to display directly in channel. If the banlist exceeds this number, it will be sent to a paste service instead. Set to 0 to always use paste service."""))
+        registry.NonNegativeInteger(0, """Sets the maximum number of ban entries to display directly in channel. If the banlist exceeds this number, it will be sent to a paste service instead (paste.debian.net). Set to 0 to always use paste service."""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

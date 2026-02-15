@@ -39,12 +39,7 @@ from supybot import world
 __version__ = "1.03"
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
-__author__ = supybot.Author("klapvogn")
-__maintainer__ = getattr(
-    supybot.authors,
-    "klapvogn",
-    supybot.Author("klapvogn", "klapvogn", "klapvogn@proton.me"),
-)
+__author__ = supybot.authors.unknown
 
 # This is a dictionary mapping supybot.Author instances to lists of
 # contributions.

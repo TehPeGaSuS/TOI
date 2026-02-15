@@ -1,6 +1,6 @@
 ### plugin.py
 # Copyright (c) 2022, Mike Oxlong
-# V1.06 - Added extban detection and blocking
+# V1.07 - Added ignoredBanMasks to skip tracking bans from services
 ###
 
 import json, os, time, threading, re
@@ -111,6 +111,13 @@ class Blacklist(callbacks.Plugin):
             if mask.startswith('~'):
                 self.log.info(f'Ignoring extban in {channel}: {mask}')
                 return
+            
+            # STOP! Don't track bans from ignored hostmasks (like services)
+            ignored_masks = self.registryValue('ignoredBanMasks', channel)
+            for ignored_pattern in ignored_masks:
+                if ircutils.hostmaskPatternEqual(ignored_pattern, msg.prefix):
+                    self.log.info(f'Ignoring ban from {msg.prefix} (matches {ignored_pattern}) in {channel}')
+                    return
             
             # Calculate expiry for manually added bans (use banlistExpiry setting)
             expiry_time = int(time.time()) + (self.registryValue('banlistExpiry', channel) * 60)

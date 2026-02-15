@@ -32,12 +32,11 @@
 Blacklist: A nifty channel ban plugin
 """
 
-import sys
 import supybot
 from supybot import world
 
 # Use this for the version of this plugin.
-__version__ = "0.2"
+__version__ = "1.03"
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
 __author__ = supybot.Author("klapvogn")
@@ -56,10 +55,7 @@ __url__ = ''
 
 from . import config
 from . import plugin
-if sys.version_info >= (3, 4):
-    from importlib import reload
-else:
-    from imp import reload
+from importlib import reload
 # In case we're being reloaded.
 reload(config)
 reload(plugin)

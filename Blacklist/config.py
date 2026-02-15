@@ -71,7 +71,7 @@ conf.registerChannelValue(Blacklist, 'banReason',
         registry.String("User has been banned from the channel.", """Sets the default blacklist message if none is given."""))
 
 conf.registerChannelValue(Blacklist, 'addManualBans',
-        registry.Boolean(True, """Sets whether to watch for channel bans directly added by users (not using the bot) to the database."""))
+        registry.Boolean(False, """Sets whether to watch for channel bans directly added by users (not using the bot) to the database."""))
 
 conf.registerChannelValue(Blacklist, 'maxListOutput',
         registry.NonNegativeInteger(5, """Sets the maximum number of ban entries to display directly in channel. If the banlist exceeds this number, it will be sent to a paste service instead. Set to 0 to always use paste service."""))

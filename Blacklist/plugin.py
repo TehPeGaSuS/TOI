@@ -1,6 +1,6 @@
 ### plugin.py
 # Copyright (c) 2022, Mike Oxlong
-# V1.03 - Added configurable paste threshold
+# V1.04 - Added expiry timestamp display
 ###
 
 import json, os, time, threading, re
@@ -104,8 +104,10 @@ class Blacklist(callbacks.Plugin):
           irc.state.channels[msg.args[0]].isHalfopPlus(irc.nick) and \
           not ircutils.strEqual(msg.nick, irc.nick) and \
           (msg.args[0] not in self.db or msg.args[2] not in self.db[msg.args[0]]):
-            try: self.db[msg.args[0]][msg.args[2]] = [msg.nick, time.time(), '*user-added ban']
-            except KeyError: self.db[msg.args[0]] = {msg.args[2]: [msg.nick, time.time(), '*user-added ban']}
+            # Calculate expiry for manually added bans (use banlistExpiry setting)
+            expiry_time = int(time.time()) + (self.registryValue('banlistExpiry', msg.args[0]) * 60)
+            try: self.db[msg.args[0]][msg.args[2]] = [msg.nick, time.time(), '*user-added ban', expiry_time, False]
+            except KeyError: self.db[msg.args[0]] = {msg.args[2]: [msg.nick, time.time(), '*user-added ban', expiry_time, False]}
             self._dbWrite()
             irc.reply(f'"{msg.args[2]}" added to the banlist for {msg.args[0]}.')
     
@@ -171,9 +173,16 @@ class Blacklist(callbacks.Plugin):
             return
         if not reason:
             reason = self.registryValue('banReason', channel)
+        # Calculate expiry timestamp
+        if timer:
+            expiry_time = int(time.time()) + (timer * 60)
+        else:
+            expiry_time = int(time.time()) + (self.registryValue('banlistExpiry', channel) * 60)
+        
         if channel not in self.db or mask not in self.db[channel]:
-            try: self.db[channel][mask] = [msg.nick, int(time.time()), reason]
-            except KeyError: self.db[channel] = {mask: [msg.nick, int(time.time()), reason]}
+            # Store: [banner_nick, ban_timestamp, reason, expiry_timestamp, is_timed]
+            try: self.db[channel][mask] = [msg.nick, int(time.time()), reason, expiry_time, bool(timer)]
+            except KeyError: self.db[channel] = {mask: [msg.nick, int(time.time()), reason, expiry_time, bool(timer)]}
             self._dbWrite()
             irc.reply(f'"{mask}" added to the banlist for {channel}.')
         irc.queueMsg(ircmsgs.ban(channel, mask))
@@ -248,7 +257,18 @@ class Blacklist(callbacks.Plugin):
         padwidth = len(max((mask for mask in self.db[channel]), key=len))
         for banmask, v in self.db[channel].items():
             elapsed = self._elapsed(v[1])
-            lines.append(f'{banmask.ljust(padwidth, " ")} - Added by {v[0]} {elapsed} ago (reason: {v[2]})')
+            
+            # Handle both old format [nick, timestamp, reason] and new format [nick, timestamp, reason, expiry, is_timed]
+            if len(v) >= 4:
+                # New format with expiry timestamp
+                expiry_timestamp = v[3]
+                is_timed = v[4] if len(v) >= 5 else False
+                expiry_str = time.strftime('%d/%m/%Y - %H:%M:%S', time.localtime(expiry_timestamp))
+                ban_type = "(timed)" if is_timed else "(permanent)"
+                lines.append(f'{banmask.ljust(padwidth, " ")} - Added by {v[0]} {elapsed} ago - Expires: {expiry_str} {ban_type} - Reason: {v[2]}')
+            else:
+                # Old format without expiry (backward compatibility)
+                lines.append(f'{banmask.ljust(padwidth, " ")} - Added by {v[0]} {elapsed} ago (reason: {v[2]})')
         
         content = '\n'.join(lines)
         

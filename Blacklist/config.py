@@ -65,7 +65,7 @@ conf.registerChannelValue(Blacklist, 'banTimerExpiry',
         registry.PositiveInteger(30, """Sets the numer of minutes before a timed ban expires if none is given."""))
 
 conf.registerChannelValue(Blacklist, 'maskNumber',
-        CurrencyCommand(10, """Sets the default banmask number if none is given."""))
+        CurrencyCommand(2, """Sets the default banmask number if none is given."""))
 
 conf.registerChannelValue(Blacklist, 'banReason',
         registry.String("User has been banned from the channel.", """Sets the default blacklist message if none is given."""))

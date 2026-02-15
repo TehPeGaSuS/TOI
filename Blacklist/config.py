@@ -77,7 +77,7 @@ conf.registerChannelValue(Blacklist, 'maxListOutput',
         registry.NonNegativeInteger(0, """Sets the maximum number of ban entries to display directly in channel. If the banlist exceeds this number, it will be sent to a paste service instead. Set to 0 to always use paste service."""))
 
 conf.registerChannelValue(Blacklist, 'ignoredBanMasks',
-        registry.SpaceSeparatedListOfStrings('ChanServ!*@*, 
+        registry.SpaceSeparatedListOfStrings('ChanServ!*@*', 
         """Space-separated list of hostmask patterns to ignore when tracking manual bans. Bans set by users matching these masks (like services bots) will not be added to the database."""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

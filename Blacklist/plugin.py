@@ -1,6 +1,6 @@
 ### plugin.py
 # Copyright (c) 2022, Mike Oxlong
-# V1.05 - Fixed manual bans to auto-remove from channel
+# V1.06 - Added extban detection and blocking
 ###
 
 import json, os, time, threading, re
@@ -106,6 +106,12 @@ class Blacklist(callbacks.Plugin):
           (msg.args[0] not in self.db or msg.args[2] not in self.db[msg.args[0]]):
             channel = msg.args[0]
             mask = msg.args[2]
+            
+            # STOP! Don't track extbans (anything starting with ~)
+            if mask.startswith('~'):
+                self.log.info(f'Ignoring extban in {channel}: {mask}')
+                return
+            
             # Calculate expiry for manually added bans (use banlistExpiry setting)
             expiry_time = int(time.time()) + (self.registryValue('banlistExpiry', channel) * 60)
             try: self.db[channel][mask] = [msg.nick, time.time(), '*user-added ban', expiry_time, False]
@@ -166,6 +172,10 @@ class Blacklist(callbacks.Plugin):
         if ircutils.isUserHostmask(target):
             if ircutils.hostmaskPatternEqual(target, irc.prefix):
                 irc.error('You want me to blacklist myself?!')
+                return
+            # STOP! Don't allow extbans
+            if target.startswith('~'):
+                irc.error('Extbans are not supported. Use traditional hostmasks only.')
                 return
             mask = target
         elif irc.isNick(target):

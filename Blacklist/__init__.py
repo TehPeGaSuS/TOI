@@ -36,7 +36,7 @@ import supybot
 from supybot import world
 
 # Use this for the version of this plugin.
-__version__ = "1.08"
+__version__ = "1.10"
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
 __author__ = supybot.authors.unknown

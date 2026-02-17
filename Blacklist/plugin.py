@@ -1,6 +1,6 @@
 ### plugin.py
 # Copyright (c) 2022, Mike Oxlong
-# V1.08 - Switched to ix.io paste service
+# V1.10 - Switched to termbin.com paste service
 ###
 
 import json, os, time, threading, re
@@ -81,17 +81,29 @@ class Blacklist(callbacks.Plugin):
         return mask
     
     def _sendToPaste(self, content):
-        """Send content to ix.io and return URL"""
+        """Send content to termbin.com and return URL"""
         try:
-            data = urllib.parse.urlencode({'f:1': content}).encode('utf-8')
-            req = urllib.request.Request('http://ix.io', data=data)
-            req.add_header('User-Agent', 'Limnoria-Blacklist-Plugin/1.08')
+            import socket
             
-            with urllib.request.urlopen(req, timeout=10) as response:
-                url = response.read().decode('utf-8').strip()
-                return url
+            # termbin.com uses netcat protocol on port 9999
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(10)
+            sock.connect(('termbin.com', 9999))
+            sock.sendall(content.encode('utf-8'))
+            sock.shutdown(socket.SHUT_WR)
+            
+            # Receive the URL
+            url = b''
+            while True:
+                data = sock.recv(1024)
+                if not data:
+                    break
+                url += data
+            sock.close()
+            
+            return url.decode('utf-8').strip()
         except Exception as e:
-            self.log.error(f'Failed to send to ix.io: {e}')
+            self.log.error(f'Failed to send to termbin.com: {e}')
             return None
     
     def doMode(self, irc, msg):

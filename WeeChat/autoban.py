@@ -389,11 +389,11 @@ def expire_bans(data, remaining_calls):
             channels = minfo.get("channels", [])
             
             for channel_info in channels:
-                # Parse server and channel from stored string
                 if "/" in channel_info:
                     server, channel = channel_info.split("/", 1)
                     apply_unban(server, channel, mask)
-                    # Print in the channel buffer instead of globally
+                    
+                    # Print in the channel buffer
                     buf = weechat.buffer_search("irc", "{}.{}".format(server, channel))
                     if buf:
                         prnt(buf, "Removed expired ban: {}".format(mask))

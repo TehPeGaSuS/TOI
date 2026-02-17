@@ -1,6 +1,6 @@
 ### plugin.py
 # Copyright (c) 2022, Mike Oxlong
-# V1.10 - Switched to termbin.com paste service
+# V1.11 - Fixed termbin null byte in response
 ###
 
 import json, os, time, threading, re
@@ -101,7 +101,8 @@ class Blacklist(callbacks.Plugin):
                 url += data
             sock.close()
             
-            return url.decode('utf-8').strip()
+            # Strip null bytes and whitespace
+            return url.decode('utf-8').rstrip('\x00\n\r ')
         except Exception as e:
             self.log.error(f'Failed to send to termbin.com: {e}')
             return None

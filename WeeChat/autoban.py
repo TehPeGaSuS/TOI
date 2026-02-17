@@ -757,7 +757,22 @@ def cmd_bantype(data, buffer, args):
              color("cyan"), BAN_TYPE_DESCRIPTIONS[new_type], color("reset")))
     return weechat.WEECHAT_RC_OK
 
-
+def cmd_help_autoban(data, buffer, args):
+    """Master help command for autoban"""
+    cmd = args.strip()
+    
+    if not cmd:
+        prnt(buffer, "Autoban commands:")
+        prnt(buffer, "  /addban    - Add a new nick entry with initial mask")
+        prnt(buffer, "  /addhost   - Add a host mask to an existing nick entry")
+        prnt(buffer, "  /delban    - Remove a nick entry or single mask")
+        prnt(buffer, "  /listban   - List all entries or details for one nick")
+        prnt(buffer, "  /checkban  - Re-apply all active bans in current channel")
+        prnt(buffer, "  /bantype   - Show or set default ban mask type (0-9)")
+        prnt(buffer, "")
+        prnt(buffer, "For detailed help on a specific command, use /help <command>")
+        return weechat.WEECHAT_RC_OK
+    
 # ---------------------------------------------------------------------------
 # Signal hooks
 # ---------------------------------------------------------------------------
@@ -808,6 +823,24 @@ if __name__ == "__main__" and weechat.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIP
         weechat.config_set_plugin("ban_type", "3")
 
     # Register commands
+    # Register master help command
+    weechat.hook_command(
+        "autoban",
+        "Autoban script - Eggdrop-style ban manager",
+        "[addban|addhost|delban|listban|checkban|bantype]",
+        "  addban   : Add a new nick entry with initial mask\n"
+        "  addhost  : Add a host mask to an existing nick entry\n"
+        "  delban   : Remove a nick entry or single mask\n"
+        "  listban  : List all entries or details for one nick\n"
+        "  checkban : Re-apply all active bans in current channel\n"
+        "  bantype  : Show or set default ban mask type (0-9)\n\n"
+        "For detailed help on a specific command, use /help <command>\n"
+        "Example: /help addban",
+        "",
+        "",
+        ""
+    )
+
     weechat.hook_command(
         "addban",
         "Add a new nick entry to the autoban list with an initial ban mask",

@@ -36,8 +36,8 @@ import re
 import time
 
 SCRIPT_NAME    = "autoban"
-SCRIPT_AUTHOR  = "you"
-SCRIPT_VERSION = "1.5.0"
+SCRIPT_AUTHOR  = "PeGaSuS"
+SCRIPT_VERSION = "1.0.0"
 SCRIPT_LICENSE = "MIT"
 SCRIPT_DESC    = "Eggdrop-style autoban manager with channel tracking"
 

@@ -20,7 +20,6 @@ import json
 import os
 import string
 import threading
-import time
 
 from supybot import conf, callbacks, ircmsgs, ircutils, utils
 
@@ -43,7 +42,8 @@ class NickTracker(callbacks.Plugin):
         self.dbfile = os.path.join(
             str(conf.supybot.directories.data), "NickTracker", "nicktracker.json"
         )
-        # Database structure: {network: {channel: [{timestamp, nick, user, host}, ...]}}
+        # Database structure: {network: {channel: {hostmask: [nicks]}}}
+        # Example: {"freenode": {"#python": {"user@host.com": ["Alice", "Bob"]}}}
         self.db = {}
         self._initdb()
 
@@ -68,42 +68,59 @@ class NickTracker(callbacks.Plugin):
         threading.Thread(target=self._write, args=(lock,)).start()
 
     def _add_record(self, network, channel, nick, user, host):
-        """Add a record to the database"""
+        """Add a nick to the host's list"""
         network = str(network)
         channel = str(channel)
+        hostmask = f"{user}@{host}"
         
         if network not in self.db:
             self.db[network] = {}
         if channel not in self.db[network]:
-            self.db[network][channel] = []
+            self.db[network][channel] = {}
+        if hostmask not in self.db[network][channel]:
+            self.db[network][channel][hostmask] = []
 
-        record = {
-            "timestamp": int(time.time()),
-            "nick": nick,
-            "user": user,
-            "host": host,
-        }
+        # Add nick if not already in list
+        if nick not in self.db[network][channel][hostmask]:
+            self.db[network][channel][hostmask].append(nick)
+            self._dbWrite()
 
-        self.db[network][channel].append(record)
-
-        # Prune old records if we exceed maxRecords (unless maxRecords is 0 = unlimited)
-        max_records = self.registryValue("maxRecords", channel, network)
-        if max_records > 0 and len(self.db[network][channel]) > max_records:
-            # Keep only the most recent records
-            self.db[network][channel] = sorted(
-                self.db[network][channel], key=lambda x: x["timestamp"], reverse=True
-            )[: max_records]
-
-        self._dbWrite()
-
-    def _get_records(self, network, channel):
-        """Get all records for a channel"""
+    def _get_nicks_for_patterns(self, network, channel, patterns, nick, user, host):
+        """Get all nicks matching the given patterns"""
         network = str(network)
         channel = str(channel)
         
         if network not in self.db or channel not in self.db[network]:
             return []
-        return self.db[network][channel]
+
+        # What to look for in the database
+        search_terms = {
+            pattern.safe_substitute(nick=nick, user=user, host=host)
+            for pattern in patterns
+        }
+
+        # Collect all matching nicks
+        all_nicks = set()
+        for hostmask, nicks in self.db[network][channel].items():
+            # Split hostmask back into user@host
+            if "@" in hostmask:
+                db_user, db_host = hostmask.split("@", 1)
+            else:
+                continue
+
+            # Check if this hostmask matches any search pattern
+            for pattern in patterns:
+                pattern_result = pattern.safe_substitute(
+                    nick="*", user=db_user, host=db_host
+                )
+                if pattern_result in search_terms:
+                    all_nicks.update(nicks)
+                    break
+
+        # Remove current nick
+        all_nicks.discard(nick)
+        
+        return list(all_nicks)
 
     def doJoin(self, irc, msg):
         """Handle JOIN events"""
@@ -138,7 +155,7 @@ class NickTracker(callbacks.Plugin):
         self._add_record(irc.network, channel, new_nick, user, host)
 
     def _announce(self, irc, channel, new_nick, user, host):
-        """Find matching records and announce to targets"""
+        """Find matching nicks and announce to targets"""
         targets = self.registryValue("targets", channel, irc.network)
         patterns = self.registryValue("patterns", channel, irc.network)
 
@@ -155,57 +172,20 @@ class NickTracker(callbacks.Plugin):
         # Compile patterns
         patterns = [string.Template(pattern) for pattern in patterns]
 
-        # What to look for in the history
-        search_terms = {
-            pattern.safe_substitute(nick=new_nick, user=user, host=host)
-            for pattern in patterns
-        }
-
-        # Get all records for this channel
-        all_records = self._get_records(irc.network, channel)
-
-        # Find matching records
-        matching_records = []
-        for record in all_records:
-            # Check if this record matches any of our search patterns
-            record_patterns = {
-                pattern.safe_substitute(
-                    nick=record["nick"], user=record["user"], host=record["host"]
-                )
-                for pattern in patterns
-            }
-            if record_patterns & search_terms:
-                matching_records.append(record)
-
-        # Sort by timestamp, most recent first
-        matching_records.sort(key=lambda x: x["timestamp"], reverse=True)
-
-        # Get the last occurrence of each nick
-        nicks = {}
-        for record in matching_records:
-            if record["nick"] in nicks:
-                continue
-            nicks[record["nick"]] = record["timestamp"]
-
-        # Remove the current nick from the list
-        if new_nick in nicks:
-            del nicks[new_nick]
+        # Get matching nicks from database
+        matching_nicks = self._get_nicks_for_patterns(
+            irc.network, channel, patterns, new_nick, user, host
+        )
 
         # If there are no other nicks, exit early
-        if not nicks:
+        if not matching_nicks:
             return
-
-        # Sort nicks by timestamp (most recent first) and get just the nick names
-        latest_nicks = [
-            nick
-            for (timestamp, nick) in sorted(
-                ((timestamp, nick) for (nick, timestamp) in nicks.items()), reverse=True
-            )
-        ]
 
         # Announce to each target
         for target in targets:
-            self._announce_join_to_target(irc, new_nick, target, channel, latest_nicks)
+            self._announce_join_to_target(
+                irc, new_nick, target, channel, matching_nicks
+            )
 
     def _announce_join_to_target(self, irc, new_nick, target, source, nicks):
         """Announce the given list of nicks to a target"""

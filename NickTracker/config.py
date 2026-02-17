@@ -99,18 +99,4 @@ conf.registerChannelValue(
     ),
 )
 
-conf.registerChannelValue(
-    NickTracker,
-    "maxRecords",
-    registry.NonNegativeInteger(
-        1000,
-        _(
-            """
-            Maximum number of records to keep per channel in the database.
-            Older records are automatically pruned. Set to 0 for unlimited.
-            """
-        ),
-    ),
-)
-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

@@ -74,7 +74,7 @@ conf.registerChannelValue(Blacklist, 'addManualBans',
         registry.Boolean(True, """Sets whether to watch for channel bans directly added by users (not using the bot) to the database."""))
 
 conf.registerChannelValue(Blacklist, 'maxListOutput',
-        registry.NonNegativeInteger(0, """Sets the maximum number of ban entries to display directly in channel. If the banlist exceeds this number, it will be sent to a paste service instead. Set to 0 to always use paste service."""))
+        registry.NonNegativeInteger(0, """Sets the maximum number of ban entries to display directly in channel. If the banlist exceeds this number, it will be sent to a paste service (ix.io) instead. Set to 0 to always use paste service."""))
 
 conf.registerChannelValue(Blacklist, 'ignoredBanMasks',
         registry.SpaceSeparatedListOfStrings('ChanServ!*@*', 

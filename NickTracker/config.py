@@ -56,15 +56,16 @@ conf.registerChannelValue(
 
 conf.registerChannelValue(
     NickTracker,
-    "patterns",
-    registry.SpaceSeparatedListOfStrings(
-        ["*!$user@$host"],
+    "defaultPattern",
+    registry.String(
+        "*!$user@$host",
         _(
             """
-            Space-separated list of patterns to use to find matches.
+            Default tracking pattern to use for matching users.
             For example, '$user@$host' finds all people with the same user
             and host, and '$host' finds all people with the same host.
             The following variables are available: $nick, $user, and $host.
+            This can be overridden for specific hostmasks using specialPatterns.
             """
         ),
     ),
@@ -82,9 +83,9 @@ conf.registerChannelValue(
             This allows specific hostmasks (like IRCCloud users) to use different
             tracking patterns than the default. Patterns support wildcards (*).
             Examples for IRCCloud (ident starts with uid/sid):
-            *!uid*@*:*!$user@$host *!sid*@*:*!$user@$host
+            "*!*uid*@*:*!$user@$host *!*sid*@*:*!$user@$host"
             The hostmask pattern matches the full nick!user@host, and the tracking
-            pattern is what to use for that match (overrides default patterns).
+            pattern is what to use for that match (overrides defaultPattern).
             """
         ),
     ),

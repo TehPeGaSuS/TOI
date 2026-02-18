@@ -67,6 +67,31 @@ class NickTracker(callbacks.Plugin):
         lock = threading.Lock()
         threading.Thread(target=self._write, args=(lock,)).start()
 
+    def _get_patterns_for_host(self, irc, channel, nick, user, host):
+        """Get tracking patterns for a specific hostmask, checking special patterns first"""
+        # Check if this hostmask matches any special patterns
+        special_patterns_list = self.registryValue("specialPatterns", channel, irc.network)
+        
+        if special_patterns_list:
+            import fnmatch
+            # Build full hostmask for matching
+            full_hostmask = f"{nick}!{user}@{host}"
+            
+            # Parse the special patterns (format: "pattern:replacement pattern2:replacement2")
+            for pattern_pair in special_patterns_list:
+                if ':' not in pattern_pair:
+                    self.log.warning(f"Invalid specialPattern format (missing colon): {pattern_pair}")
+                    continue
+                
+                hostmask_pattern, tracking_pattern = pattern_pair.split(':', 1)
+                
+                if fnmatch.fnmatch(full_hostmask, hostmask_pattern):
+                    # Return the special pattern as a list
+                    return [tracking_pattern]
+        
+        # Use default patterns
+        return self.registryValue("patterns", channel, irc.network)
+
     def _add_record(self, network, channel, nick, user, host):
         """Add a nick to the host's list"""
         network = str(network)
@@ -157,7 +182,9 @@ class NickTracker(callbacks.Plugin):
     def _announce(self, irc, channel, new_nick, user, host):
         """Find matching nicks and announce to targets"""
         targets = self.registryValue("targets", channel, irc.network)
-        patterns = self.registryValue("patterns", channel, irc.network)
+        
+        # Get patterns specific to this hostmask (checks special patterns first)
+        patterns = self._get_patterns_for_host(irc, channel, new_nick, user, host)
 
         # Discard any pattern that has no variable at all
         patterns = [

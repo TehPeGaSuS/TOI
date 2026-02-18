@@ -70,6 +70,26 @@ conf.registerChannelValue(
     ),
 )
 
+conf.registerChannelValue(
+    NickTracker,
+    "specialPatterns",
+    registry.SpaceSeparatedListOfStrings(
+        [],
+        _(
+            """
+            Space-separated list of special hostmask patterns in format:
+            hostmask_pattern:tracking_pattern
+            This allows specific hostmasks (like IRCCloud users) to use different
+            tracking patterns than the default. Patterns support wildcards (*).
+            Examples for IRCCloud (ident starts with uid/sid):
+            *!uid*@*:*!$user@$host *!sid*@*:*!$user@$host
+            The hostmask pattern matches the full nick!user@host, and the tracking
+            pattern is what to use for that match (overrides default patterns).
+            """
+        ),
+    ),
+)
+
 conf.registerGroup(NickTracker, "announce")
 conf.registerGroup(NickTracker.announce, "nicks")
 

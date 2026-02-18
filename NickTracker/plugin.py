@@ -93,22 +93,30 @@ class NickTracker(callbacks.Plugin):
         default_pattern = self.registryValue("defaultPattern", channel, irc.network)
         return [default_pattern]
 
-    def _add_record(self, network, channel, nick, user, host):
-        """Add a nick to the host's list"""
+    def _add_record(self, irc, network, channel, nick, user, host):
+        """Add a nick to the appropriate pattern's list"""
         network = str(network)
         channel = str(channel)
-        hostmask = f"{user}@{host}"
+        
+        # Get the pattern that would be used for this user
+        patterns = self._get_patterns_for_host(irc, channel, nick, user, host)
+        if not patterns:
+            return
+        
+        # Use the first pattern to generate the key
+        pattern = string.Template(patterns[0])
+        hostmask_key = pattern.safe_substitute(nick=nick, user=user, host=host)
         
         if network not in self.db:
             self.db[network] = {}
         if channel not in self.db[network]:
             self.db[network][channel] = {}
-        if hostmask not in self.db[network][channel]:
-            self.db[network][channel][hostmask] = []
+        if hostmask_key not in self.db[network][channel]:
+            self.db[network][channel][hostmask_key] = []
 
         # Add nick if not already in list
-        if nick not in self.db[network][channel][hostmask]:
-            self.db[network][channel][hostmask].append(nick)
+        if nick not in self.db[network][channel][hostmask_key]:
+            self.db[network][channel][hostmask_key].append(nick)
             self._dbWrite()
 
     def _get_nicks_for_patterns(self, network, channel, patterns, nick, user, host):
@@ -178,7 +186,7 @@ class NickTracker(callbacks.Plugin):
         self._announce(irc, channel, new_nick, user, host)
         
         # Add the new record to database
-        self._add_record(irc.network, channel, new_nick, user, host)
+        self._add_record(irc, irc.network, channel, new_nick, user, host)
 
     def _announce(self, irc, channel, new_nick, user, host):
         """Find matching nicks and announce to targets"""

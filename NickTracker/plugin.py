@@ -89,8 +89,9 @@ class NickTracker(callbacks.Plugin):
                     # Return the special pattern as a list
                     return [tracking_pattern]
         
-        # Use default patterns
-        return self.registryValue("patterns", channel, irc.network)
+        # Use default pattern
+        default_pattern = self.registryValue("defaultPattern", channel, irc.network)
+        return [default_pattern]
 
     def _add_record(self, network, channel, nick, user, host):
         """Add a nick to the host's list"""

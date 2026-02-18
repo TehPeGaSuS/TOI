@@ -127,29 +127,15 @@ class NickTracker(callbacks.Plugin):
         if network not in self.db or channel not in self.db[network]:
             return []
 
-        # What to look for in the database
-        search_terms = {
-            pattern.safe_substitute(nick=nick, user=user, host=host)
-            for pattern in patterns
-        }
+        # What to look for in the database (the key that would be generated for this user)
+        search_key = patterns[0].safe_substitute(nick=nick, user=user, host=host)
 
         # Collect all matching nicks
         all_nicks = set()
-        for hostmask, nicks in self.db[network][channel].items():
-            # Split hostmask back into user@host
-            if "@" in hostmask:
-                db_user, db_host = hostmask.split("@", 1)
-            else:
-                continue
-
-            # Check if this hostmask matches any search pattern
-            for pattern in patterns:
-                pattern_result = pattern.safe_substitute(
-                    nick="*", user=db_user, host=db_host
-                )
-                if pattern_result in search_terms:
-                    all_nicks.update(nicks)
-                    break
+        for db_key, nicks in self.db[network][channel].items():
+            # Direct match: does this database key match what we're searching for?
+            if db_key == search_key:
+                all_nicks.update(nicks)
 
         # Remove current nick
         all_nicks.discard(nick)

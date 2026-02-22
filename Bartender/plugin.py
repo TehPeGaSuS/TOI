@@ -220,9 +220,8 @@ class Bartender(callbacks.Plugin):
 
     # -- helpers -------------------------------------------------------------
 
-    def _is_enabled(self, irc, msg):
+    def _is_enabled(self, irc, msg, channel):
         """Return True if the plugin is enabled; else tell the user and return False."""
-        channel = msg.channel
         if not self.registryValue('enabled', channel, irc.network):
             irc.reply(
                 'The bar is closed in %s.' % channel,
@@ -231,7 +230,7 @@ class Bartender(callbacks.Plugin):
             return False
         return True
 
-    def _check_cooldown(self, irc, channel, cooldown_dict, cooldown_seconds):
+    def _check_cooldown(self, channel, cooldown_dict, cooldown_seconds):
         """Return True if the action is allowed. Return False silently if on cooldown."""
         if cooldown_seconds == 0:
             return True
@@ -272,16 +271,16 @@ class Bartender(callbacks.Plugin):
         """
         if not msg.channel:
             irc.error('This command must be used in a channel.', Raise=True)
-        if not self._is_enabled(irc, msg):
+        channel = msg.channel
+        if not self._is_enabled(irc, msg, channel):
             return
 
-        channel = msg.channel
         cooldown = self.registryValue('cooldown', channel, irc.network)
-        if not self._check_cooldown(irc, channel, self._order_cooldowns, cooldown):
+        if not self._check_cooldown(channel, self._order_cooldowns, cooldown):
             return  # silent on cooldown
 
-        # If there are multiple words, the last word is always the target nick
-        # and everything before it is the drink name. Single word = self-order.
+        # Last word is always the target nick; everything before it is the
+        # drink name. Single word = self-order.
         parts = drink_arg.strip().split(' ')
         if len(parts) == 1:
             drink_name = parts[0]
@@ -336,12 +335,12 @@ class Bartender(callbacks.Plugin):
         """
         if not msg.channel:
             irc.error('This command must be used in a channel.', Raise=True)
-        if not self._is_enabled(irc, msg):
+        channel = msg.channel
+        if not self._is_enabled(irc, msg, channel):
             return
 
-        channel = msg.channel
         cooldown = self.registryValue('roundCooldown', channel, irc.network)
-        if not self._check_cooldown(irc, channel, self._round_cooldowns, cooldown):
+        if not self._check_cooldown(channel, self._round_cooldowns, cooldown):
             return  # silent on cooldown
 
         drink = self.db.get_drink(channel, drink_name.strip())
@@ -366,80 +365,83 @@ class Bartender(callbacks.Plugin):
 
     class bartender(callbacks.Commands):
 
-        def add(self, irc, msg, args, name, serve_msg):
-            """<n> [<serve message>]
+        def _plugin(self, irc):
+            """Return the parent Bartender plugin instance."""
+            return irc.getCallback('Bartender')
 
-            Adds a new drink to this channel's menu. The serve message is
-            optional -- if omitted, the channel default is used
-            (config channel plugins.Bartender.defaultServeMessage).
-            Use $nick (who ordered), $target (recipient), $drink (drink name),
-            $channel, and $courtesy (expands to ', courtesy of $nick' when
-            ordering for someone else, empty string otherwise) in the message.
+        def add(self, irc, msg, args, channel, name, serve_msg):
+            """[<channel>] <n> [<serve message>]
+
+            Adds a new drink to the channel's menu. <channel> is only needed
+            when messaging the bot in PM. The serve message is optional -- if
+            omitted, the channel default is used. Use $nick (who ordered),
+            $target (recipient), $drink (drink name), $channel, and $courtesy
+            (expands to ', courtesy of $nick' when ordering for someone else,
+            empty string on self-order) in the message.
             Example: !bartender add beer
             Example: !bartender add tequila pours $target a shot of tequila$courtesy.
             """
-            if not msg.channel:
-                irc.error('This command must be used in a channel.', Raise=True)
-            if not self.parent._require_admin(irc, msg):
+            plugin = self._plugin(irc)
+            if not plugin._require_admin(irc, msg):
                 return
             if not serve_msg:
-                serve_msg = self.parent.registryValue(
-                    'defaultServeMessage', msg.channel, irc.network)
-            ok = self.parent.db.add_drink(msg.channel, name, serve_msg, msg.nick)
+                serve_msg = plugin.registryValue(
+                    'defaultServeMessage', channel, irc.network)
+            ok = plugin.db.add_drink(channel, name, serve_msg, msg.nick)
             if ok:
                 irc.replySuccess()
             else:
-                irc.error('A drink named "%s" already exists in %s.' % (name, msg.channel))
+                irc.error('A drink named "%s" already exists in %s.' % (name, channel))
 
-        add = wrap(add, ['something', optional('text')])
+        add = wrap(add, ['channeldb', 'something', optional('text')])
 
-        def remove(self, irc, msg, args, name):
-            """<n>
+        def remove(self, irc, msg, args, channel, name):
+            """[<channel>] <n>
 
-            Removes a drink (and all its aliases) from this channel's menu.
+            Removes a drink (and all its aliases) from the channel's menu.
+            <channel> is only needed when messaging the bot in PM.
             Example: !bartender remove beer
             """
-            if not msg.channel:
-                irc.error('This command must be used in a channel.', Raise=True)
-            if not self.parent._require_admin(irc, msg):
+            plugin = self._plugin(irc)
+            if not plugin._require_admin(irc, msg):
                 return
-            ok = self.parent.db.remove_drink(msg.channel, name)
+            ok = plugin.db.remove_drink(channel, name)
             if ok:
                 irc.replySuccess()
             else:
                 irc.error('No drink named "%s" found.' % name)
 
-        remove = wrap(remove, ['something'])
+        remove = wrap(remove, ['channeldb', 'something'])
 
-        def edit(self, irc, msg, args, name, serve_msg):
-            """<n> <new serve message>
+        def edit(self, irc, msg, args, channel, name, serve_msg):
+            """[<channel>] <n> <new serve message>
 
-            Edits the serve message for a drink in this channel's menu.
+            Edits the serve message for a drink in the channel's menu.
+            <channel> is only needed when messaging the bot in PM.
             Example: !bartender edit beer slides an ice-cold pint to $target$courtesy.
             """
-            if not msg.channel:
-                irc.error('This command must be used in a channel.', Raise=True)
-            if not self.parent._require_admin(irc, msg):
+            plugin = self._plugin(irc)
+            if not plugin._require_admin(irc, msg):
                 return
-            ok = self.parent.db.edit_drink(msg.channel, name, serve_msg)
+            ok = plugin.db.edit_drink(channel, name, serve_msg)
             if ok:
                 irc.replySuccess()
             else:
                 irc.error('No drink named "%s" found.' % name)
 
-        edit = wrap(edit, ['something', 'text'])
+        edit = wrap(edit, ['channeldb', 'something', 'text'])
 
-        def alias(self, irc, msg, args, drink_name, alias):
-            """<drink name> <alias>
+        def alias(self, irc, msg, args, channel, drink_name, alias):
+            """[<channel>] <drink name> <alias>
 
-            Adds an alias for an existing drink in this channel's menu.
+            Adds an alias for an existing drink in the channel's menu.
+            <channel> is only needed when messaging the bot in PM.
             Example: !bartender alias whiskey bourbon
             """
-            if not msg.channel:
-                irc.error('This command must be used in a channel.', Raise=True)
-            if not self.parent._require_admin(irc, msg):
+            plugin = self._plugin(irc)
+            if not plugin._require_admin(irc, msg):
                 return
-            ok, reason = self.parent.db.add_alias(msg.channel, drink_name, alias)
+            ok, reason = plugin.db.add_alias(channel, drink_name, alias)
             if ok:
                 irc.replySuccess()
             elif reason == 'no_drink':
@@ -447,44 +449,44 @@ class Bartender(callbacks.Plugin):
             else:
                 irc.error('The alias "%s" already exists.' % alias)
 
-        alias = wrap(alias, ['something', 'something'])
+        alias = wrap(alias, ['channeldb', 'something', 'something'])
 
-        def show(self, irc, msg, args, name):
-            """<n>
+        def show(self, irc, msg, args, channel, name):
+            """[<channel>] <n>
 
-            Shows the serve message and aliases for a drink in this channel's menu.
+            Shows the serve message and aliases for a drink in the channel's menu.
+            <channel> is only needed when messaging the bot in PM.
             Example: !bartender show beer
             """
-            if not msg.channel:
-                irc.error('This command must be used in a channel.', Raise=True)
-            drink = self.parent.db.get_drink(msg.channel, name)
+            plugin = self._plugin(irc)
+            drink = plugin.db.get_drink(channel, name)
             if drink is None:
                 irc.error('No drink named "%s" found.' % name)
                 return
-            aliases = self.parent.db.get_aliases(msg.channel, drink['name'])
+            aliases = plugin.db.get_aliases(channel, drink['name'])
             alias_str = (', aliases: ' + ', '.join(aliases)) if aliases else ''
             irc.reply(
                 '[%s%s] %s' % (drink['name'], alias_str, drink['serve_msg']),
                 prefixNick=False
             )
 
-        show = wrap(show, ['something'])
+        show = wrap(show, ['channeldb', 'something'])
 
-        def list(self, irc, msg, args):
-            """(takes no arguments)
+        def list(self, irc, msg, args, channel):
+            """[<channel>]
 
-            Lists all available drinks in this channel's menu.
+            Lists all available drinks in the channel's menu.
+            <channel> is only needed when messaging the bot in PM.
             Example: !bartender list
             """
-            if not msg.channel:
-                irc.error('This command must be used in a channel.', Raise=True)
-            drinks = self.parent.db.list_drinks(msg.channel)
+            plugin = self._plugin(irc)
+            drinks = plugin.db.list_drinks(channel)
             if not drinks:
                 irc.reply("The menu is empty. Ask an admin to add some drinks!")
             else:
                 irc.reply('Available drinks: ' + ', '.join(drinks), prefixNick=False)
 
-        list = wrap(list, [])
+        list = wrap(list, ['channeldb'])
 
 
 Class = Bartender

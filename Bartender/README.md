@@ -19,7 +19,7 @@ A fun IRC bartender plugin. Serve drinks to users, buy the whole channel a round
 | Command | Description |
 |---|---|
 | `!order <drink>` | Serve yourself a drink |
-| `!order <drink> for <nick>` | Serve a drink to someone else in the channel |
+| `!order <drink> <nick>` | Serve a drink to someone else in the channel |
 | `!round <drink>` | Buy a round for the whole channel |
 | `!bartender list` | List all available drinks |
 | `!bartender show <drink>` | Show the serve message and aliases for a drink |
@@ -50,7 +50,7 @@ When adding or editing a drink's custom serve message, the following tokens are 
 | Token | Expands to |
 |---|---|
 | `$nick` | The nick of whoever ordered |
-| `$target` | The recipient (same as `$nick` if no `for <nick>` given) |
+| `$target` | The recipient (same as `$nick` if no target nick given) |
 | `$drink` | The canonical drink name |
 | `$channel` | The channel name |
 | `$courtesy` | `, courtesy of $nick` when ordering for someone else; empty string when self-ordering |
@@ -63,7 +63,7 @@ The `$courtesy` token is the key to making a single custom message handle both c
 !order "pint of beer"
 * YourBot serves Nick a pint of beer.
 
-!order "pint of beer" for Alice
+!order "pint of beer" Alice
 * YourBot serves Alice a pint of beer, courtesy of Nick.
 ```
 
@@ -141,10 +141,10 @@ slides a round of $drink down the bar for everyone in $channel, courtesy of $nic
 !order beer
 * YourBot serves Nick a beer.
 
-!order "pint of beer" for Alice
+!order "pint of beer" Alice
 * YourBot serves Alice a pint of beer, courtesy of Nick.
 
-!order whiskey for Bob
+!order whiskey Bob
 * YourBot pours Bob a glass of whiskey, courtesy of Nick.
 
 !round beer

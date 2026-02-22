@@ -262,12 +262,13 @@ class Bartender(callbacks.Plugin):
     # -- public commands -----------------------------------------------------
 
     def order(self, irc, msg, args, drink_arg):
-        """<drink> [for <nick>]
+        """<drink> [<nick>]
 
-        Orders a drink from the bar. If "for <nick>" is provided, the drink is
-        served to that user instead. The target must be in the channel.
+        Orders a drink from the bar. If a nick is given as the last word, the
+        drink is served to that user instead. The target must be in the channel.
         Example: !order beer
-        Example: !order beer for Alice
+        Example: !order beer Alice
+        Example: !order shot of tequila Alice
         """
         if not msg.channel:
             irc.error('This command must be used in a channel.', Raise=True)
@@ -279,17 +280,22 @@ class Bartender(callbacks.Plugin):
         if not self._check_cooldown(irc, channel, self._order_cooldowns, cooldown):
             return  # silent on cooldown
 
-        # Parse "drink [for nick]"
-        if ' for ' in drink_arg:
-            drink_name, target = [s.strip() for s in drink_arg.split(' for ', 1)]
-        else:
-            drink_name = drink_arg.strip()
+        # If there are multiple words, the last word is always the target nick
+        # and everything before it is the drink name. Single word = self-order.
+        parts = drink_arg.strip().split(' ')
+        if len(parts) == 1:
+            drink_name = parts[0]
             target = msg.nick
-
-        # Validate target is in channel (only when explicitly given)
-        if target != msg.nick and not self._nick_in_channel(irc, channel, target):
-            irc.reply('%s is not in %s.' % (target, channel), prefixNick=False)
-            return
+        else:
+            drink_name = ' '.join(parts[:-1])
+            target = parts[-1]
+            if not self._nick_in_channel(irc, channel, target):
+                irc.reply(
+                    "Sorry %s, I don't see a customer with the name %s in %s."
+                    % (msg.nick, target, channel),
+                    prefixNick=False
+                )
+                return
 
         drink = self.db.get_drink(drink_name)
         if drink is None:

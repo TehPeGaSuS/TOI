@@ -35,10 +35,24 @@ These require the `admin` capability.
 | `!bartender edit <name> <new serve message>` | Edit a drink's serve message |
 | `!bartender alias <drink> <alias>` | Add an alias for a drink |
 
-Multi-word drink names must be quoted:
+Multi-word drink names must be quoted when managing the menu, since the first
+argument is parsed as a single token. As an alternative, you can use a
+single-word key and put the full name in the serve message:
+
 ```
 !bartender add "pint of beer"
 !bartender add "shot of tequila" pours $target a shot of tequila$courtesy.
+
+# Or equivalently, with a single-word key:
+!bartender add beer serves $target a pint of beer$courtesy.
+!bartender add tequila pours $target a shot of tequila$courtesy.
+```
+
+Quotes are **never** needed when ordering — the last word is always the target:
+```
+!order pint of beer
+!order pint of beer Alice
+!order tequila Alice
 ```
 
 ---
@@ -59,11 +73,13 @@ The `$courtesy` token is the key to making a single custom message handle both c
 
 ```
 !bartender add "pint of beer" serves $target a pint of beer$courtesy.
+# or with a single-word key:
+!bartender add beer serves $target a pint of beer$courtesy.
 
-!order "pint of beer"
+!order pint of beer
 * YourBot serves Nick a pint of beer.
 
-!order "pint of beer" Alice
+!order pint of beer Alice
 * YourBot serves Alice a pint of beer, courtesy of Nick.
 ```
 
@@ -133,7 +149,7 @@ slides a round of $drink down the bar for everyone in $channel, courtesy of $nic
 !config channel plugins.Bartender.enabled True
 
 !bartender add beer
-!bartender add "pint of beer" serves $target a pint of beer$courtesy.
+!bartender add tequila pours $target a shot of tequila$courtesy.
 !bartender add whiskey pours $target a glass of whiskey$courtesy.
 !bartender alias whiskey bourbon
 !bartender alias whiskey scotch
@@ -141,8 +157,8 @@ slides a round of $drink down the bar for everyone in $channel, courtesy of $nic
 !order beer
 * YourBot serves Nick a beer.
 
-!order "pint of beer" Alice
-* YourBot serves Alice a pint of beer, courtesy of Nick.
+!order tequila Alice
+* YourBot pours Alice a shot of tequila, courtesy of Nick.
 
 !order whiskey Bob
 * YourBot pours Bob a glass of whiskey, courtesy of Nick.

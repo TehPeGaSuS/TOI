@@ -27,7 +27,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ###
 
-import os
 import time
 import sqlite3
 import string
@@ -44,23 +43,22 @@ _ = PluginInternationalization('Bartender')
 
 
 # ---------------------------------------------------------------------------
-# Database layer
+# Database layer — one SQLite file per channel
 # ---------------------------------------------------------------------------
 
 class BartenderDB:
-    """Global SQLite database for the drink menu."""
+    """Per-channel SQLite databases for the drink menu."""
 
-    def __init__(self, filename):
-        self.filename = filename
-        self._db = None
+    def __init__(self):
+        self._dbs = {}  # {filename: connection}
 
-    def _get_db(self):
-        if self._db is not None:
-            return self._db
-        db = sqlite3.connect(self.filename, check_same_thread=False)
+    def _get_db(self, channel):
+        filename = plugins.makeChannelFilename('Bartender.db', channel)
+        if filename in self._dbs:
+            return self._dbs[filename]
+        db = sqlite3.connect(filename, check_same_thread=False)
         db.row_factory = sqlite3.Row
-        cursor = db.cursor()
-        cursor.executescript("""
+        db.cursor().executescript("""
             CREATE TABLE IF NOT EXISTS drinks (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
                 name        TEXT    NOT NULL UNIQUE COLLATE NOCASE,
@@ -77,19 +75,19 @@ class BartenderDB:
             );
         """)
         db.commit()
-        self._db = db
+        self._dbs[filename] = db
         return db
 
     def close(self):
-        if self._db is not None:
-            self._db.close()
-            self._db = None
+        for db in self._dbs.values():
+            db.close()
+        self._dbs.clear()
 
     # -- resolution ----------------------------------------------------------
 
-    def resolve(self, name):
+    def resolve(self, channel, name):
         """Return the canonical drink name, following aliases. None if unknown."""
-        db = self._get_db()
+        db = self._get_db(channel)
         c = db.cursor()
         c.execute("SELECT name FROM drinks WHERE name = ?", (name,))
         row = c.fetchone()
@@ -101,12 +99,12 @@ class BartenderDB:
             return row['drink_name']
         return None
 
-    def get_drink(self, name):
+    def get_drink(self, channel, name):
         """Return a dict with {name, serve_msg} or None."""
-        canonical = self.resolve(name)
+        canonical = self.resolve(channel, name)
         if canonical is None:
             return None
-        db = self._get_db()
+        db = self._get_db(channel)
         c = db.cursor()
         c.execute("SELECT name, serve_msg FROM drinks WHERE name = ?", (canonical,))
         row = c.fetchone()
@@ -114,8 +112,8 @@ class BartenderDB:
 
     # -- CRUD ----------------------------------------------------------------
 
-    def add_drink(self, name, serve_msg, added_by):
-        db = self._get_db()
+    def add_drink(self, channel, name, serve_msg, added_by):
+        db = self._get_db(channel)
         try:
             db.execute(
                 "INSERT INTO drinks (name, serve_msg, added_by) VALUES (?, ?, ?)",
@@ -124,22 +122,22 @@ class BartenderDB:
             db.commit()
             return True
         except sqlite3.IntegrityError:
-            return False  # already exists
+            return False
 
-    def remove_drink(self, name):
-        canonical = self.resolve(name)
+    def remove_drink(self, channel, name):
+        canonical = self.resolve(channel, name)
         if canonical is None:
             return False
-        db = self._get_db()
+        db = self._get_db(channel)
         db.execute("DELETE FROM drinks WHERE name = ?", (canonical,))
         db.commit()
         return True
 
-    def edit_drink(self, name, serve_msg):
-        canonical = self.resolve(name)
+    def edit_drink(self, channel, name, serve_msg):
+        canonical = self.resolve(channel, name)
         if canonical is None:
             return False
-        db = self._get_db()
+        db = self._get_db(channel)
         db.execute(
             "UPDATE drinks SET serve_msg = ? WHERE name = ?",
             (serve_msg, canonical)
@@ -147,11 +145,11 @@ class BartenderDB:
         db.commit()
         return True
 
-    def add_alias(self, drink_name, alias):
-        canonical = self.resolve(drink_name)
+    def add_alias(self, channel, drink_name, alias):
+        canonical = self.resolve(channel, drink_name)
         if canonical is None:
             return False, 'no_drink'
-        db = self._get_db()
+        db = self._get_db(channel)
         try:
             db.execute(
                 "INSERT INTO aliases (alias, drink_name) VALUES (?, ?)",
@@ -162,17 +160,17 @@ class BartenderDB:
         except sqlite3.IntegrityError:
             return False, 'exists'
 
-    def list_drinks(self):
-        db = self._get_db()
+    def list_drinks(self, channel):
+        db = self._get_db(channel)
         c = db.cursor()
         c.execute("SELECT name FROM drinks ORDER BY name COLLATE NOCASE")
         return [row['name'] for row in c.fetchall()]
 
-    def get_aliases(self, drink_name):
-        canonical = self.resolve(drink_name)
+    def get_aliases(self, channel, drink_name):
+        canonical = self.resolve(channel, drink_name)
         if canonical is None:
             return None
-        db = self._get_db()
+        db = self._get_db(channel)
         c = db.cursor()
         c.execute(
             "SELECT alias FROM aliases WHERE drink_name = ? ORDER BY alias COLLATE NOCASE",
@@ -200,6 +198,9 @@ class Bartender(callbacks.Plugin):
     channel a round with !round, and manage the drink menu with
     !bartender add/remove/alias/edit/show/list.
 
+    The drink menu is per-channel, so each channel can have its own drinks
+    and serve messages in any language.
+
     Enable the bar per channel with:
         config channel plugins.Bartender.enabled True
     """
@@ -208,8 +209,7 @@ class Bartender(callbacks.Plugin):
 
     def __init__(self, irc):
         super().__init__(irc)
-        db_path = conf.supybot.directories.data.dirize('Bartender.db')
-        self.db = BartenderDB(db_path)
+        self.db = BartenderDB()
         # Cooldown tracking: {channel: last_timestamp}
         self._order_cooldowns = {}
         self._round_cooldowns = {}
@@ -238,7 +238,7 @@ class Bartender(callbacks.Plugin):
         now = time.time()
         last = cooldown_dict.get(channel, 0)
         if now - last < cooldown_seconds:
-            return False  # silent -- no message
+            return False
         cooldown_dict[channel] = now
         return True
 
@@ -297,7 +297,7 @@ class Bartender(callbacks.Plugin):
                 )
                 return
 
-        drink = self.db.get_drink(drink_name)
+        drink = self.db.get_drink(channel, drink_name)
         if drink is None:
             irc.reply(
                 "I don't know how to make that. Try !bartender list.",
@@ -305,19 +305,15 @@ class Bartender(callbacks.Plugin):
             )
             return
 
-        # Use the drink's custom message if it differs from the self-order
-        # default, meaning the admin gave it a real custom message. Otherwise
-        # pick the appropriate default based on whether this is a self-order
-        # or an order for someone else.
-        default_self = self.registryValue('defaultServeMessage')
-        default_for  = self.registryValue('defaultServeMessageFor')
+        # Use the drink's custom message if it differs from both defaults.
+        # Otherwise pick the appropriate default based on self vs for-someone.
+        default_self = self.registryValue('defaultServeMessage', channel, irc.network)
+        default_for  = self.registryValue('defaultServeMessageFor', channel, irc.network)
         stored_msg   = drink['serve_msg']
 
         if stored_msg in (default_self, default_for):
-            # Drink uses a default template -- pick the contextually right one
             template = default_for if target != msg.nick else default_self
         else:
-            # Drink has a real custom message -- always use it as-is
             template = stored_msg
 
         courtesy = ', courtesy of %s' % msg.nick if target != msg.nick else ''
@@ -348,7 +344,7 @@ class Bartender(callbacks.Plugin):
         if not self._check_cooldown(irc, channel, self._round_cooldowns, cooldown):
             return  # silent on cooldown
 
-        drink = self.db.get_drink(drink_name.strip())
+        drink = self.db.get_drink(channel, drink_name.strip())
         if drink is None:
             irc.reply(
                 "I don't know how to make that. Try !bartender list.",
@@ -373,38 +369,41 @@ class Bartender(callbacks.Plugin):
         def add(self, irc, msg, args, name, serve_msg):
             """<n> [<serve message>]
 
-            Adds a new drink to the menu. The serve message is optional -- if
-            omitted, the global default is used
-            (config plugins.Bartender.defaultServeMessage).
+            Adds a new drink to this channel's menu. The serve message is
+            optional -- if omitted, the channel default is used
+            (config channel plugins.Bartender.defaultServeMessage).
             Use $nick (who ordered), $target (recipient), $drink (drink name),
             $channel, and $courtesy (expands to ', courtesy of $nick' when
             ordering for someone else, empty string otherwise) in the message.
             Example: !bartender add beer
-            Example: !bartender add "pint of beer" serves $target a pint of beer$courtesy.
+            Example: !bartender add tequila pours $target a shot of tequila$courtesy.
             """
+            if not msg.channel:
+                irc.error('This command must be used in a channel.', Raise=True)
             if not self.parent._require_admin(irc, msg):
                 return
             if not serve_msg:
-                # Store the self-order default; the order command will swap it
-                # for defaultServeMessageFor at serve time when target != nick.
-                serve_msg = self.parent.registryValue('defaultServeMessage')
-            ok = self.parent.db.add_drink(name, serve_msg, msg.nick)
+                serve_msg = self.parent.registryValue(
+                    'defaultServeMessage', msg.channel, irc.network)
+            ok = self.parent.db.add_drink(msg.channel, name, serve_msg, msg.nick)
             if ok:
                 irc.replySuccess()
             else:
-                irc.error('A drink named "%s" already exists.' % name)
+                irc.error('A drink named "%s" already exists in %s.' % (name, msg.channel))
 
         add = wrap(add, ['something', optional('text')])
 
         def remove(self, irc, msg, args, name):
             """<n>
 
-            Removes a drink (and all its aliases) from the menu.
+            Removes a drink (and all its aliases) from this channel's menu.
             Example: !bartender remove beer
             """
+            if not msg.channel:
+                irc.error('This command must be used in a channel.', Raise=True)
             if not self.parent._require_admin(irc, msg):
                 return
-            ok = self.parent.db.remove_drink(name)
+            ok = self.parent.db.remove_drink(msg.channel, name)
             if ok:
                 irc.replySuccess()
             else:
@@ -415,12 +414,14 @@ class Bartender(callbacks.Plugin):
         def edit(self, irc, msg, args, name, serve_msg):
             """<n> <new serve message>
 
-            Edits the serve message for an existing drink.
-            Example: !bartender edit beer slides an ice-cold pint to $target
+            Edits the serve message for a drink in this channel's menu.
+            Example: !bartender edit beer slides an ice-cold pint to $target$courtesy.
             """
+            if not msg.channel:
+                irc.error('This command must be used in a channel.', Raise=True)
             if not self.parent._require_admin(irc, msg):
                 return
-            ok = self.parent.db.edit_drink(name, serve_msg)
+            ok = self.parent.db.edit_drink(msg.channel, name, serve_msg)
             if ok:
                 irc.replySuccess()
             else:
@@ -431,13 +432,14 @@ class Bartender(callbacks.Plugin):
         def alias(self, irc, msg, args, drink_name, alias):
             """<drink name> <alias>
 
-            Adds an alias for an existing drink so users can order it by
-            another name.
-            Example: !bartender alias beer lager
+            Adds an alias for an existing drink in this channel's menu.
+            Example: !bartender alias whiskey bourbon
             """
+            if not msg.channel:
+                irc.error('This command must be used in a channel.', Raise=True)
             if not self.parent._require_admin(irc, msg):
                 return
-            ok, reason = self.parent.db.add_alias(drink_name, alias)
+            ok, reason = self.parent.db.add_alias(msg.channel, drink_name, alias)
             if ok:
                 irc.replySuccess()
             elif reason == 'no_drink':
@@ -450,14 +452,16 @@ class Bartender(callbacks.Plugin):
         def show(self, irc, msg, args, name):
             """<n>
 
-            Shows the serve message and aliases for a drink.
+            Shows the serve message and aliases for a drink in this channel's menu.
             Example: !bartender show beer
             """
-            drink = self.parent.db.get_drink(name)
+            if not msg.channel:
+                irc.error('This command must be used in a channel.', Raise=True)
+            drink = self.parent.db.get_drink(msg.channel, name)
             if drink is None:
                 irc.error('No drink named "%s" found.' % name)
                 return
-            aliases = self.parent.db.get_aliases(drink['name'])
+            aliases = self.parent.db.get_aliases(msg.channel, drink['name'])
             alias_str = (', aliases: ' + ', '.join(aliases)) if aliases else ''
             irc.reply(
                 '[%s%s] %s' % (drink['name'], alias_str, drink['serve_msg']),
@@ -469,12 +473,14 @@ class Bartender(callbacks.Plugin):
         def list(self, irc, msg, args):
             """(takes no arguments)
 
-            Lists all available drinks on the menu.
+            Lists all available drinks in this channel's menu.
             Example: !bartender list
             """
-            drinks = self.parent.db.list_drinks()
+            if not msg.channel:
+                irc.error('This command must be used in a channel.', Raise=True)
+            drinks = self.parent.db.list_drinks(msg.channel)
             if not drinks:
-                irc.reply('The menu is empty. Ask an admin to add some drinks!')
+                irc.reply("The menu is empty. Ask an admin to add some drinks!")
             else:
                 irc.reply('Available drinks: ' + ', '.join(drinks), prefixNick=False)
 

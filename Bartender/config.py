@@ -62,22 +62,24 @@ conf.registerChannelValue(
         Set to 0 to disable the cooldown entirely.
     """)))
 
-conf.registerGlobalValue(
+conf.registerChannelValue(
     Bartender, 'defaultServeMessage',
     registry.String(
         'serves $target a $drink.',
         _("""
         Default serve message when ordering for yourself (or when a drink has
-        no custom message). Supports $nick, $target, $drink, $channel.
+        no custom message). Can be overridden per channel.
+        Supports $nick, $target, $drink, $channel.
     """)))
 
-conf.registerGlobalValue(
+conf.registerChannelValue(
     Bartender, 'defaultServeMessageFor',
     registry.String(
         'serves $target a $drink, courtesy of $nick.',
         _("""
         Default serve message when ordering a drink for someone else
         (target != nick) and the drink has no custom message.
+        Can be overridden per channel.
         Supports $nick, $target, $drink, $channel.
     """)))
 
@@ -86,8 +88,8 @@ conf.registerChannelValue(
     registry.String(
         'slides a round of $drink down the bar for everyone in $channel, courtesy of $nick!',
         _("""
-        Template for the !round command. Supports the following tokens:
-        $drink (drink name), $channel (channel name), $nick (who ordered).
+        Template for the !round command. Can be overridden per channel.
+        Supports $drink, $channel, $nick.
     """)))
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

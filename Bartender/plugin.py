@@ -299,11 +299,28 @@ class Bartender(callbacks.Plugin):
             )
             return
 
-        text = _substitute(drink['serve_msg'], {
-            'nick':    msg.nick,
-            'target':  target,
-            'drink':   drink['name'],
-            'channel': channel,
+        # Use the drink's custom message if it differs from the self-order
+        # default, meaning the admin gave it a real custom message. Otherwise
+        # pick the appropriate default based on whether this is a self-order
+        # or an order for someone else.
+        default_self = self.registryValue('defaultServeMessage')
+        default_for  = self.registryValue('defaultServeMessageFor')
+        stored_msg   = drink['serve_msg']
+
+        if stored_msg in (default_self, default_for):
+            # Drink uses a default template -- pick the contextually right one
+            template = default_for if target != msg.nick else default_self
+        else:
+            # Drink has a real custom message -- always use it as-is
+            template = stored_msg
+
+        courtesy = ', courtesy of %s' % msg.nick if target != msg.nick else ''
+        text = _substitute(template, {
+            'nick':     msg.nick,
+            'target':   target,
+            'drink':    drink['name'],
+            'channel':  channel,
+            'courtesy': courtesy,
         })
         irc.reply(text, action=True, prefixNick=False)
 
@@ -354,13 +371,16 @@ class Bartender(callbacks.Plugin):
             omitted, the global default is used
             (config plugins.Bartender.defaultServeMessage).
             Use $nick (who ordered), $target (recipient), $drink (drink name),
-            and $channel in the message.
+            $channel, and $courtesy (expands to ', courtesy of $nick' when
+            ordering for someone else, empty string otherwise) in the message.
             Example: !bartender add beer
-            Example: !bartender add beer slides a cold pint to $target
+            Example: !bartender add "pint of beer" serves $target a pint of beer$courtesy.
             """
             if not self.parent._require_admin(irc, msg):
                 return
             if not serve_msg:
+                # Store the self-order default; the order command will swap it
+                # for defaultServeMessageFor at serve time when target != nick.
                 serve_msg = self.parent.registryValue('defaultServeMessage')
             ok = self.parent.db.add_drink(name, serve_msg, msg.nick)
             if ok:

@@ -30,39 +30,76 @@ These require the `admin` capability.
 
 | Command | Description |
 |---|---|
-| `!bartender add <name> <serve message>` | Add a new drink |
+| `!bartender add <name> [<serve message>]` | Add a new drink, optionally with a custom serve message |
 | `!bartender remove <name>` | Remove a drink and all its aliases |
 | `!bartender edit <name> <new serve message>` | Edit a drink's serve message |
 | `!bartender alias <drink> <alias>` | Add an alias for a drink |
+
+Multi-word drink names must be quoted:
+```
+!bartender add "pint of beer"
+!bartender add "shot of tequila" pours $target a shot of tequila$courtesy.
+```
 
 ---
 
 ## Serve message tokens
 
-When adding or editing a drink, you can use the following tokens in the serve message:
+When adding or editing a drink's custom serve message, the following tokens are available:
 
-| Token | Replaced with |
+| Token | Expands to |
 |---|---|
 | `$nick` | The nick of whoever ordered |
-| `$target` | The intended recipient (same as `$nick` if no `for <nick>` given) |
+| `$target` | The recipient (same as `$nick` if no `for <nick>` given) |
 | `$drink` | The canonical drink name |
 | `$channel` | The channel name |
+| `$courtesy` | `, courtesy of $nick` when ordering for someone else; empty string when self-ordering |
 
-**Example:**
+The `$courtesy` token is the key to making a single custom message handle both cases cleanly:
+
 ```
-!bartender add beer slides a cold pint of $drink down the bar to $target
+!bartender add "pint of beer" serves $target a pint of beer$courtesy.
+
+!order "pint of beer"
+* YourBot serves Nick a pint of beer.
+
+!order "pint of beer" for Alice
+* YourBot serves Alice a pint of beer, courtesy of Nick.
 ```
-When `Alice` orders `!order beer for Bob`:
-> \* YourBot slides a cold pint of beer down the bar to Bob
+
+---
+
+## Default serve messages
+
+When a drink is added **without** a custom serve message, the bot picks one of two global default templates depending on who is being served:
+
+| Situation | Config key | Default value |
+|---|---|---|
+| Ordering for yourself | `plugins.Bartender.defaultServeMessage` | `serves $target a $drink.` |
+| Ordering for someone else | `plugins.Bartender.defaultServeMessageFor` | `serves $target a $drink, courtesy of $nick.` |
+
+Both defaults can be changed globally with:
+```
+!config plugins.Bartender.defaultServeMessage <new template>
+!config plugins.Bartender.defaultServeMessageFor <new template>
+```
+
+If a drink **does** have a custom serve message, that message is always used as-is — the `$courtesy` token inside it handles the self vs for-someone-else distinction.
 
 ---
 
 ## Configuration
 
-All config values are per-channel. Set them with:
-```
-!config channel plugins.Bartender.<key> <value>
-```
+### Global (applies across all channels and networks)
+
+| Key | Default | Description |
+|---|---|---|
+| `plugins.Bartender.defaultServeMessage` | `serves $target a $drink.` | Default template for self-orders |
+| `plugins.Bartender.defaultServeMessageFor` | `serves $target a $drink, courtesy of $nick.` | Default template when ordering for someone else |
+
+### Per-channel
+
+Set with `!config channel plugins.Bartender.<key> <value>`:
 
 | Key | Default | Description |
 |---|---|---|
@@ -80,12 +117,13 @@ slides a round of $drink down the bar for everyone in $channel, courtesy of $nic
 
 ## Behaviour notes
 
-- **Bar closed**: If `enabled` is `False`, any `!order` or `!round` command will be met with: `The bar is closed in #channel.`
-- **Cooldowns**: When still on cooldown, the bot stays **silent** (no error message, no spam).
-- **Unknown target**: If the target nick is not in the channel, the bot replies: `Alice is not in #channel.`
-- **Unknown drink**: Bot replies: `I don't know how to make that. Try !bartender list.`
-- **Aliases**: Aliases are global and resolve to their canonical drink name. Removing a drink also removes all its aliases.
-- **Database**: A single global `Bartender.db` SQLite file lives in the bot's data directory. The drink menu is shared across all channels and networks.
+- **Bar closed**: If `enabled` is `False`, any `!order` or `!round` command replies with: `The bar is closed in #channel.`
+- **Cooldowns**: When still on cooldown the bot stays **silent** — no error, no spam.
+- **Unknown target**: If the target nick is not in the channel: `Alice is not in #channel.`
+- **Unknown drink**: `I don't know how to make that. Try !bartender list.`
+- **All responses** to `!order` and `!round` are sent as IRC `/me` actions.
+- **Aliases**: Global and resolved to their canonical drink name. Removing a drink also removes all its aliases.
+- **Database**: A single global `Bartender.db` SQLite file in the bot's data directory. The drink menu is shared across all channels and networks.
 
 ---
 
@@ -93,9 +131,22 @@ slides a round of $drink down the bar for everyone in $channel, courtesy of $nic
 
 ```irc
 !config channel plugins.Bartender.enabled True
-!bartender add beer slides a cold pint of $drink down the bar to $target
-!bartender add whiskey pours a fine glass of $drink for $target. Neat, just how they like it.
-!bartender alias beer lager
-!order beer for Alice
-!round whiskey
+
+!bartender add beer
+!bartender add "pint of beer" serves $target a pint of beer$courtesy.
+!bartender add whiskey pours $target a glass of whiskey$courtesy.
+!bartender alias whiskey bourbon
+!bartender alias whiskey scotch
+
+!order beer
+* YourBot serves Nick a beer.
+
+!order "pint of beer" for Alice
+* YourBot serves Alice a pint of beer, courtesy of Nick.
+
+!order whiskey for Bob
+* YourBot pours Bob a glass of whiskey, courtesy of Nick.
+
+!round beer
+* YourBot slides a round of beer down the bar for everyone in #channel, courtesy of Nick!
 ```

@@ -283,11 +283,11 @@ def numeric_failed_join_cb(data, signal, signal_data):
     if state["disabled"]:
         return weechat.WEECHAT_RC_OK
 
-    buf_print(
-        f"Cannot join {channel} on {server} "
-        f"(numeric {numeric}, attempt {tries_display(state)}) "
-        f"— retrying in {retry_delay}s"
-    )
+    # Only print on the first attempt — retries are silent until we give up
+    if state["tries"] == 0:
+        buf_print(
+            f"Cannot join {channel} on {server} — retrying in {retry_delay}s"
+        )
     schedule_rejoin(server, channel)
     return weechat.WEECHAT_RC_OK
 
@@ -320,10 +320,10 @@ def kick_cb(data, signal, signal_data):
 
     state = get_state(server, channel)
 
-    buf_print(
-        f"Kicked from {channel} on {server} "
-        f"— rejoining in {retry_delay}s (attempt {tries_display(state)})"
-    )
+    if state["tries"] == 0:
+        buf_print(
+            f"Kicked from {channel} on {server} — rejoining in {retry_delay}s"
+        )
     schedule_rejoin(server, channel)
     return weechat.WEECHAT_RC_OK
 

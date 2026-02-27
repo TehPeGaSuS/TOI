@@ -3,11 +3,12 @@
 A [WeeChat](https://weechat.org/) script that replicates the join attempt
 limiting behaviour of [ZNC](https://znc.in/)'s built-in `JoinTries` setting.
 
-When you're banned from a channel, WeeChat will keep trying to rejoin
-indefinitely. ZNC handles this more gracefully — it tracks how many times
-it has tried, and after a configurable number of failures it gives up,
-disables the channel, and tells you about it. This script brings that same
-behaviour to WeeChat.
+When you're banned from a channel, WeeChat will attempt to rejoin once
+(if `irc.server_default.autorejoin` is on) and then give up silently.
+ZNC handles this more gracefully — it tracks how many times it has tried,
+keeps retrying on a schedule, and after a configurable number of failures
+it gives up, disables the channel, and tells you about it. This script
+brings that same behaviour to WeeChat.
 
 ## How it works
 
